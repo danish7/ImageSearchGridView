@@ -38,7 +38,6 @@ import java.net.URLEncoder;
 public class GridFragment extends Fragment {
 
     private static final String TAG = GridFragment.class.getCanonicalName();
-    private static final String QUERY = "com.danish.uberproject.ui.fragments.QUERY";
 
     private GridAdapter gridAdapter;
     private GridView gridView;
@@ -47,45 +46,33 @@ public class GridFragment extends Fragment {
     private String query;
     private ResponseData responseData;
 
-    private int scrollPosition = -1;
-
-
-    public static GridFragment newInstance (String query) {
-        GridFragment fragment = new GridFragment();
-        Bundle args = new Bundle();
-        args.putString(QUERY, query);
-        fragment.setArguments(args);
-        return fragment;
+    /**
+     * Retain the fragment instance to handle device orientation changes
+     * This method will not be called when activity recreates on orientation change
+     */
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setRetainInstance(true);
+        gridAdapter = new GridAdapter(getActivity());
     }
+
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         progressDialog = new ProgressDialog(getActivity());
         progressDialog.setMessage(getString(R.string.loading_more_images));
-        //if (scrollPosition == -1) {
-        setRetainInstance(true);
-        if (scrollPosition == -1) {
-            Bundle bundle = getArguments();
-            query = bundle.getString(QUERY);
-            handleSearchQuery(query);
-        }
-
-           // gridView.smoothScrollToPosition(scrollPosition);
-       // }
-       // }
+        gridView.setAdapter(gridAdapter);
+        gridView.setOnScrollListener(gridScrollListener);
     }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.grid_frag_layout, container, false);
         gridView = (GridView) view.findViewById(R.id.image_grid);
-        gridAdapter = new GridAdapter(getActivity());
-        gridAdapter.clearItems();
-        gridView.setAdapter(gridAdapter);
-        gridView.setOnScrollListener(gridScrollListener);
         return view;
-
     }
 
 
@@ -99,15 +86,23 @@ public class GridFragment extends Fragment {
         suggestions.saveRecentQuery(query, null);
     }
 
-    private void handleSearchQuery (String query) {
+
+    /**
+     * Start the image search using the query we got from the SearchView
+     * @param query The string containing the image search query
+     */
+    public void handleSearchQuery (String query) {
 
         if (gridAdapter != null) {
             gridAdapter.clearItems();
             itemsOffScreen = false;
         }
         if (IOUtil.isValidInput(query)) {
+
             saveSearchQuery(query);
             searchGoogleImages(query, "&start=0&q=");
+            this.query = query;
+
         } else {
             UiUtil.showSimpleDialog(getActivity(), R.string.error, R.string.invalid_query);
         }

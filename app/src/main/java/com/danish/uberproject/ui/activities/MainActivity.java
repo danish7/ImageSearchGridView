@@ -3,8 +3,7 @@ package com.danish.uberproject.ui.activities;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.widget.SearchView;
@@ -39,12 +38,16 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
+    /**
+     * Grab the search query string from the intent delivered by the SearchView and let the grid
+     * view fragment handle the downloading and displaying of images
+     * @param intent The intent received from the Searchable
+     */
     private void handleIntent (Intent intent) {
         String query = intent.getStringExtra(SearchManager.QUERY);
-        GridFragment gridFragment = GridFragment.newInstance(query);
-        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.grid_parent, gridFragment);
-        fragmentTransaction.commit();
+        FragmentManager fm = getSupportFragmentManager();
+        GridFragment gridFragment =  (GridFragment) fm.findFragmentById(R.id.grid_fragment);
+        gridFragment.handleSearchQuery(query);
         searchView.setQuery(query, false);
         searchView.clearFocus();
     }

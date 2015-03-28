@@ -1,9 +1,17 @@
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_height="fill_parent"
     android:layout_width="fill_parent"
     android:id="@+id/grid_parent"
     android:background="@color/background_material_dark"
     android:padding="@dimen/default_border_padding">
+
+    <fragment
+        android:name="com.danish.uberproject.ui.fragments.GridFragment"
+        android:id="@+id/grid_fragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:layout="@layout/grid_frag_layout" />
 
 </FrameLayout>
